@@ -16,7 +16,7 @@ Lunar Lander-v2 has been tested using ***Deep Q Learning***, ***Policy Gradient*
 + [A2C Temporal Difference]()
 + [Q Actor-Critic]()
 ## Author
-*Boban Stanisljevic* [@Boban](https://www.linkedin.com/in/bobanstanisljevic/)
+*Boban Stanisljevic* <br /> [@Boban](https://www.linkedin.com/in/bobanstanisljevic/)
 ## Version History
 + 0.1
   + Initial Release
