@@ -1,7 +1,7 @@
 # Lunar Lander-v2
 This environment is part of the [Box2D environments](https://www.gymlibrary.ml/environments/box2d/) from the [gym](https://www.gymlibrary.ml/) library. 
 ## Description
-Lunar Lander-v2 has been tested using ***Deep Q Learning***, ***Policy Gradient*** and ***Actor Critic*** algorithms. During the training, it was noticed that the environment was solved the fastest with the Deep Q Learning algorithm.  
+Lunar Lander-v2 has been tested using ***Deep Q Learning***, ***Policy Gradient*** and ***Actor Critic*** algorithms.
 ## Getting Started
 ### Dependencies
 + [TensorFlow-v2](https://www.tensorflow.org/resources/learn-ml?gclid=Cj0KCQjwz96WBhC8ARIsAATR250n3d06htjOi2LgNLJwxvVIvFgcFyb8_MPiK66tsFpwqWN9TvPyB94aAiWSEALw_wcB)
