@@ -1,11 +1,10 @@
-import collections
-import statistics
 import tqdm
 import tensorflow as tf
 import numpy as np
 
-from dqn_model import DQNNetwork
-from replay_buffer import ReplayBuffer
+from dqn_target.dqn_model import DQNNetwork
+from dqn_target.replay_buffer import ReplayBuffer
+from dqn_target.utils import plot_learning
 
 tf.compat.v1.disable_eager_execution()
 
@@ -126,14 +125,15 @@ class DQNAgent:
         @param max_episodes: maximum number of agent training episodes
         @param min_episodes_criterion: minimum number of episodes to meet the criteria
         """
-        episodes_reward = collections.deque(maxlen=100)
+
+        episodes_reward = []
 
         with tqdm.trange(max_episodes) as t:
             for i in t:
                 episode_reward = int(self.run_episode())
 
                 episodes_reward.append(episode_reward)
-                running_reward = statistics.mean(episodes_reward)
+                running_reward = np.mean(episodes_reward[-100:])
 
                 t.set_description(f'Episode {i}')
                 t.set_postfix(episode_reward=episode_reward, running_reward=running_reward)
@@ -143,12 +143,14 @@ class DQNAgent:
 
         self.main_model.save_weights("dql_model_weights/")
         print(f'Solved at episode {i}: average reward: {running_reward:.2f}!')
+        plot_learning(np.arange(0, i+1), np.array(episodes_reward), "Episodes", "Rewards")
 
     def test_agent(self, display_episode=False):
         """Tests the agent on one episode
 
         @param display_episode: whether to show the episode
         """
+
         state = self.env.reset()
         total_reward, done = 0, False
         while not done:
@@ -160,4 +162,11 @@ class DQNAgent:
         if display_episode:
             self.env.close()
         print(f'Episode reward: {total_reward:.2f}!')
+
+    def load_weights(self, filename):
+        """Loads weights of the network that is located in filename."""
+
+        self.main_model.load_weights(filename)
+        self.target_model.load_weights(filename)
+
 

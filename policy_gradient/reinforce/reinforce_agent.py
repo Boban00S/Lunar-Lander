@@ -1,10 +1,9 @@
-import collections
-import statistics
-import tensorflow as tf
 import tqdm
+import tensorflow as tf
 import numpy as np
 
-from reinforce_model import ReinforceNetwork
+from reinforce.reinforce_model import ReinforceNetwork
+from reinforce.utils import plot_learning
 
 
 class ReinforceAgent:
@@ -20,6 +19,7 @@ class ReinforceAgent:
         @param learning_rate: model's learning rate
         @param num_hidden_units: number of neurons in hidden layer
         """
+
         self.env = env
         num_actions = env.action_space.n
         self.model = ReinforceNetwork(num_actions, num_hidden_units)
@@ -45,6 +45,7 @@ class ReinforceAgent:
         @param max_steps: max possible step's per episode
         @return: returns log probabilities and rewards in each step of the episode
         """
+
         action_log_probs = tf.TensorArray(dtype=tf.float32, size=0, dynamic_size=True)
         rewards = tf.TensorArray(dtype=tf.float32, size=0, dynamic_size=True)
 
@@ -76,6 +77,7 @@ class ReinforceAgent:
         @param standardize: boolean value whether to do standardization
         @return: returns discounted cumulative rewards at each step
         """
+
         n = tf.shape(rewards)[0]
         returns = tf.TensorArray(dtype=tf.float32, size=n)
 
@@ -102,6 +104,7 @@ class ReinforceAgent:
         @param max_steps_per_episode: max possible step's per episode
         @return: returns episode reward
         """
+
         with tf.GradientTape() as tape:
             action_log_probs, rewards = self.run_episode(initial_state, max_steps_per_episode)
 
@@ -126,7 +129,8 @@ class ReinforceAgent:
         @param max_episodes: maximum number of agent training episodes
         @param min_episodes_criterion: minimum number of episodes to meet the criteria
         """
-        episodes_reward = collections.deque(maxlen=100)
+
+        episodes_reward = []
 
         with tqdm.trange(max_episodes) as t:
             for i in t:
@@ -134,7 +138,7 @@ class ReinforceAgent:
                 episode_reward = int(self.train_step(initial_state))
 
                 episodes_reward.append(episode_reward)
-                running_reward = statistics.mean(episodes_reward)
+                running_reward = np.mean(episodes_reward[-100:])
 
                 t.set_description(f'Episode {i}')
                 t.set_postfix(episode_reward=episode_reward, running_reward=running_reward)
@@ -144,21 +148,28 @@ class ReinforceAgent:
 
         self.model.save_weights("reinforce_model_weights/")
         print(f'Solved at episode {i}: average reward: {running_reward:.2f}')
+        plot_learning(np.arange(0, i+1), np.array(episodes_reward), "Episodes", "Rewards")
 
     def test_agent(self, display_episode=False):
         """Tests the agent on one episode
 
         @param display_episode: whether to show the episode
         """
+
         state = self.env.reset()
         total_reward, done = 0, False
         while not done:
+            state = tf.expand_dims(state, 0)
             if display_episode:
                 self.env.render()
-            action = self.model(state).sample()[0]
+            action = self.model(state).sample().numpy()[0]
             state, reward, done = self.env_step(action)
             total_reward += reward
         if display_episode:
             self.env.close()
         print(f'Episode reward: {total_reward:.2f}!')
 
+    def load_weights(self, filename):
+        """Loads weights of the network that is located in filename."""
+
+        self.model.load_weights(filename)

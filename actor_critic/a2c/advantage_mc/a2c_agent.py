@@ -1,13 +1,9 @@
-import collections
-import numpy as np
-import statistics
-import tensorflow as tf
 import tqdm
-import os
+import numpy as np
+import tensorflow as tf
 
-from a2c_model import ActorCriticNetwork
-
-os.environ["TP_CPP_MIN_LOG_LEVEL"] = "3"
+from a2c.advantage_mc.a2c_model import ActorCriticNetwork
+from utils import plot_learning
 
 
 class ActorCriticAgent:
@@ -155,7 +151,7 @@ class ActorCriticAgent:
         @param min_episodes_criterion: minimum number of episodes to meet the criteria
         """
 
-        episodes_reward = collections.deque(maxlen=100)
+        episodes_reward = []
 
         with tqdm.trange(max_episodes) as t:
             for i in t:
@@ -163,7 +159,7 @@ class ActorCriticAgent:
                 episode_reward = int(self.train_step(initial_state))
 
                 episodes_reward.append(episode_reward)
-                running_reward = statistics.mean(episodes_reward)
+                running_reward = np.mean(episodes_reward[-100:])
 
                 t.set_description(f'Episode {i}')
                 t.set_postfix(episode_reward=episode_reward, running_reward=running_reward)
@@ -171,28 +167,31 @@ class ActorCriticAgent:
                 if running_reward > reward_threshold and i >= min_episodes_criterion:
                     break
 
-        self.model.save_weights("a2c_mc_model_weights/")
+        self.model.save_weights("weights/a2c_mc_model_weights/")
         print(f'Solved at episode {i}: average reward: {running_reward:.2f}!')
+        plot_learning(np.arange(0, i+1), np.array(episodes_reward), "Episodes", "Rewards")
 
     def test_agent(self, display_episode=False):
         """Tests the agent on one episode
 
         @param display_episode: whether to show the episode
         """
+
         state = self.env.reset()
         total_reward, done = 0, False
         while not done:
+            state = tf.expand_dims(state, 0)
             if display_episode:
                 self.env.render()
             action_distributions, _ = self.model(state)
-            action = action_distributions.sample()[0]
+            action = action_distributions.sample().numpy()[0]
             state, reward, done = self.env_step(action)
             total_reward += reward
         if display_episode:
             self.env.close()
         print(f'Episode reward: {total_reward:.2f}!')
 
-# import gym
-# env = gym.make("LunarLander-v2")
-# agent = ActorCriticAgent(env)
-# agent.train_agent()
+    def load_weights(self, filename):
+        """Loads weights of the network that is located in filename."""
+
+        self.model.load_weights(filename)
