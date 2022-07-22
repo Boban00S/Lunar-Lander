@@ -10,11 +10,11 @@ Lunar Lander-v2 has been tested using ***Deep Q Learning***, ***Policy Gradient*
 + [Seaborn](https://seaborn.pydata.org/)
 + [tqdm](https://tqdm.github.io/)
 ### Executing program
-+ [Deep Q Learning]()
-+ [REINFORCE Policy Gradient]()
-+ [A2C Monte Carlo]()
-+ [A2C Temporal Difference]()
-+ [Q Actor-Critic]()
++ [Deep Q Learning](https://github.com/Boban00S/Lunar-Lander/blob/main/deep_q_learning/Deep%20Q%20Learning.ipynb)
++ [REINFORCE Policy Gradient](https://github.com/Boban00S/Lunar-Lander/blob/main/policy_gradient/Policy%20Gradient.ipynb)
++ [A2C Monte Carlo](https://github.com/Boban00S/Lunar-Lander/blob/main/actor_critic/Actor%20Critic.ipynb)
++ [A2C Temporal Difference](https://github.com/Boban00S/Lunar-Lander/blob/main/actor_critic/Actor%20Critic.ipynb)
++ [Q Actor-Critic](https://github.com/Boban00S/Lunar-Lander/blob/main/actor_critic/Actor%20Critic.ipynb)
 ## Author
 *Boban Stanisljevic* <br /> [@Boban](https://www.linkedin.com/in/bobanstanisljevic/)
 ## Version History
